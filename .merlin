@@ -1,0 +1,5 @@
+PKG core
+PKG menhir
+
+S src/
+B _build/
