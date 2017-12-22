@@ -18,6 +18,7 @@ rule read = parse
 | newline { read lexbuf }
 | float { FLOAT (float_of_string (get lexbuf))}
 | ';' { SEMICOLON }
+| ',' { COMMA }
 | '+' { PLUS }
 | '-' { MINUS }
 | '*' { TIMES }

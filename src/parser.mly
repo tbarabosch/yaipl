@@ -3,6 +3,7 @@
 %token PLUS MINUS TIMES DIV
 %token DEF
 %token SEMICOLON
+%token COMMA
 %token LPAREN RPAREN
 %token EXTERN
 %token EOF
@@ -18,8 +19,8 @@ main:
 
 statement:
 | e = expr SEMICOLON { e }
-| EXTERN p = prototype SEMICOLON { p }
-| DEF name = ID LPAREN arg = ID RPAREN e = expr SEMICOLON { Astree.Function (name, arg, e) } 
+| EXTERN s = signature SEMICOLON { s }
+| DEF s = signature e = expr SEMICOLON { Astree.Function (s, e) }
 
 expr:
 | i = ID { Astree.Variable i }
@@ -28,7 +29,15 @@ expr:
 | e1 = expr MINUS e2 = expr { Astree.Binary ('-', e1, e2) }
 | e1 = expr TIMES e2 = expr { Astree.Binary ('*', e1, e2) }
 | e1 = expr DIV e2 = expr { Astree.Binary ('/', e1, e2) }
-| name = ID LPAREN e = expr RPAREN { Astree.Call (name, e) }
+| name = ID LPAREN args = call_arguments RPAREN { Astree.Call (name, args) }
 
-prototype:
-| x = ID LPAREN a1 = ID RPAREN { Astree.Prototype (x, a1) }
+signature:
+| symbol_name = ID LPAREN args = arguments RPAREN { Astree.Prototype (symbol_name, args) }
+
+arguments:
+| arg = ID { [arg] }
+| arg = ID rest = arguments { arg :: rest}
+
+call_arguments:
+| arg = expr { [arg] }
+| arg = expr COMMA rest = call_arguments { arg :: rest}

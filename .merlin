@@ -1,5 +1,7 @@
 PKG core
 PKG menhir
+PKG ocamllex
+PKG llvm
 
 S src/
 B _build/
