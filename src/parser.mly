@@ -21,11 +21,11 @@ main:
 
 statement:
 | e = expr SEMICOLON { e }
-| LPAREN e = expr RPAREN SEMICOLON { e }
 | EXTERN s = signature SEMICOLON { s }
 | DEF s = signature BEGIN b = function_body END { Astree.Function (s, b) }
 
 expr:
+| LPAREN e = expr RPAREN { e }
 | i = ID { Astree.Variable i }
 | x = FLOAT { Astree.Number x }
 | e1 = expr PLUS e2 = expr { Astree.Binary ('+', e1, e2) }

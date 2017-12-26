@@ -8,7 +8,7 @@ let builder = builder context
 let named_values:(string, llvalue) Hashtbl.t = Hashtbl.create 10
 let double_type = double_type context
 
-let rec codegen_stmt = function
+let rec codegen_stmt ast jit_context = match ast with
   | Astree.Number n -> const_float double_type n
   | Astree.Variable name ->
      begin
@@ -18,8 +18,8 @@ let rec codegen_stmt = function
      end
   | Astree.Binary (op, lhs, rhs) ->
      begin
-       let lhs_val = codegen_stmt lhs in
-       let rhs_val = codegen_stmt rhs in
+       let lhs_val = codegen_stmt lhs jit_context in
+       let rhs_val = codegen_stmt rhs jit_context in
        begin
          match op with
          | '+' -> build_fadd lhs_val rhs_val "addtmp" builder
@@ -47,7 +47,7 @@ let rec codegen_stmt = function
        else
          raise (Error "incorrect # arguments passed");
 
-       let args = List.map codegen_stmt args in
+       let args = List.map (fun arg -> codegen_stmt arg jit_context) args in
        build_call callee (Array.of_list args) "calltmp" builder
      end
   | Astree.Prototype (name, args) ->
@@ -79,15 +79,15 @@ let rec codegen_stmt = function
   | Astree.Function (proto, body) ->
      begin
        Hashtbl.clear named_values;
-       let the_function = codegen_stmt proto in
+       let the_function = codegen_stmt proto jit_context in
        let bb = append_block context  "entry" the_function in
        position_at_end bb builder;
        try
-         let body_stmts = (List.map (fun x -> codegen_stmt x) body) in
+         let body_stmts = (List.map (fun stmt -> codegen_stmt stmt jit_context) body) in
            begin
               let _ = build_ret (List.hd (List.rev body_stmts)) builder in
-              (* FIXME: Llvm_analysis module unknown *)
-              (* Llvm_analysis.assert_valid_function the_function; *)
+              Llvm_analysis.assert_valid_function the_function;
+              (* let _ = PassManager.run_function the_function jit_context.pass_manager in *)
               the_function
             end
        with e -> delete_function the_function; raise e

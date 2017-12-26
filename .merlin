@@ -1,7 +1,11 @@
-PKG core
+PKG core_kernel
 PKG menhir
 PKG ocamllex
 PKG llvm
+PKG llvm.executionengine
+PKG llvm.target
+PKG llvm.scalar_opts
+PKG llvm.analysis
 
 S src/
 B _build/
