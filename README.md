@@ -7,26 +7,36 @@ Compile it and test it as follows:
 ``` bash
 ./build.sh
 ./yaipl.native 
-ready> extern cos(x); extern tan(z); def crazy_math(a b c) a*a + b - c + a * b * c; crazy_math(cos(4), tan(0.42), 0.4 * 42); 
+ready> def fib(x)
+  begin
+    if x < 3 then
+      1
+    else
+      fib(x-1)+fib(x-2)
+  end
+
+fib (20);
 ```
 
 This should generate the following LLVM IR:
 ``` bash
-
-declare double @cos(double %x)
-
-declare double @tan(double %z)
-
-define double @crazy_math(double %a, double %b, double %c) {
+define double @fib(double %x) {
 entry:
-  %multmp = fmul double %a, %a
-  %addtmp = fadd double %multmp, %b
-  %subtmp = fsub double %addtmp, %c
-  %multmp1 = fmul double %a, %b
-  %multmp2 = fmul double %multmp1, %c
-  %addtmp3 = fadd double %subtmp, %multmp2
-  ret double %addtmp3
-}
-  %calltmp5 = call double @crazy_math(double %calltmp, double %calltmp4, double 1.680000e+01)
-```
+  %cmptmp = fcmp ult double %x, 3.000000e+00
+  br i1 %cmptmp, label %ifcont, label %else
 
+else:                                             ; preds = %entry
+  %subtmp = fadd double %x, -1.000000e+00
+  %calltmp = call double @fib(double %subtmp)
+  %subtmp1 = fadd double %x, -2.000000e+00
+  %calltmp2 = call double @fib(double %subtmp1)
+  %addtmp = fadd double %calltmp, %calltmp2
+  br label %ifcont
+
+ifcont:                                           ; preds = %entry, %else
+  %iftmp = phi double [ %addtmp, %else ], [ 1.000000e+00, %entry ]
+  ret double %iftmp
+}
+  %calltmp3 = call double @fib(double 2.000000e+01)
+
+```
