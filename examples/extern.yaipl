@@ -1,0 +1,4 @@
+extern sin(a);
+extern cos(a);
+def tan(a) begin sin(a) / cos(a); end
+tan(45);

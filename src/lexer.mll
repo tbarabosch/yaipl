@@ -23,8 +23,14 @@ rule read = parse
 | '-' { MINUS }
 | '*' { TIMES }
 | '/' { DIV }
+| '<' { LT }
 | '(' { LPAREN }
 | ')' { RPAREN }
+| "if" { IF }
+| "then" { THEN }
+| "else" { ELSE }
+| "for" { FOR }
+| "in" { IN }
 | "def" { DEF }
 | "extern" { EXTERN }
 | "begin" { BEGIN }

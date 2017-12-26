@@ -1,15 +1,18 @@
 %token <float> FLOAT
 %token <string> ID
 %token PLUS MINUS TIMES DIV
+%token LT
 %token DEF
 %token SEMICOLON
 %token COMMA
 %token LPAREN RPAREN
 %token EXTERN
 %token EOF
-%token BEGIN
-%token END
+%token BEGIN END
+%token IF THEN ELSE
+%token FOR IN
 
+%left LT
 %left PLUS MINUS
 %left TIMES DIV 
 
@@ -32,6 +35,7 @@ expr:
 | e1 = expr MINUS e2 = expr { Astree.Binary ('-', e1, e2) }
 | e1 = expr TIMES e2 = expr { Astree.Binary ('*', e1, e2) }
 | e1 = expr DIV e2 = expr { Astree.Binary ('/', e1, e2) }
+| e1 = expr LT e2 = expr { Astree.Binary ('<', e1, e2) }
 | name = ID LPAREN args = call_arguments RPAREN { Astree.Call (name, args) }
 
 signature:
@@ -48,3 +52,4 @@ call_arguments:
 function_body:
 | e = expr SEMICOLON { [e] }
 | e = expr SEMICOLON f = function_body { e :: f }
+| IF condition = expr THEN then_expr = expr ELSE else_expr = expr { [Astree.If (condition, then_expr, else_expr)] }
