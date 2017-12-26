@@ -7,6 +7,8 @@
 %token LPAREN RPAREN
 %token EXTERN
 %token EOF
+%token BEGIN
+%token END
 
 %left PLUS MINUS
 %left TIMES DIV 
@@ -19,8 +21,9 @@ main:
 
 statement:
 | e = expr SEMICOLON { e }
+| LPAREN e = expr RPAREN SEMICOLON { e }
 | EXTERN s = signature SEMICOLON { s }
-| DEF s = signature e = expr SEMICOLON { Astree.Function (s, e) }
+| DEF s = signature BEGIN b = function_body END { Astree.Function (s, b) }
 
 expr:
 | i = ID { Astree.Variable i }
@@ -41,3 +44,7 @@ arguments:
 call_arguments:
 | arg = expr { [arg] }
 | arg = expr COMMA rest = call_arguments { arg :: rest}
+
+function_body:
+| e = expr SEMICOLON { [e] }
+| e = expr SEMICOLON f = function_body { e :: f }

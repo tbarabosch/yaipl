@@ -4,5 +4,4 @@ type expr =
   | Binary of char * expr * expr
   | Call of string * expr list
   | Prototype of string * string list
-  | Function of expr * expr
-
+  | Function of expr * expr list

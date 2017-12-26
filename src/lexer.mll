@@ -27,6 +27,8 @@ rule read = parse
 | ')' { RPAREN }
 | "def" { DEF }
 | "extern" { EXTERN }
+| "begin" { BEGIN }
+| "end" { END}
 | id {ID (get lexbuf)}
 | _ { raise (Error)}
 | eof { EOF }

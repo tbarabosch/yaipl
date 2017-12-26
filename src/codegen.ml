@@ -83,10 +83,12 @@ let rec codegen_stmt = function
        let bb = append_block context  "entry" the_function in
        position_at_end bb builder;
        try
-         let ret_val = codegen_stmt body in
-         let _ = build_ret ret_val builder in
-         (* FIXME: Llvm_analysis module unknown *)
-         (* Llvm_analysis.assert_valid_function the_function; *)
-         the_function
+         let body_stmts = (List.map (fun x -> codegen_stmt x) body) in
+           begin
+              let _ = build_ret (List.hd (List.rev body_stmts)) builder in
+              (* FIXME: Llvm_analysis module unknown *)
+              (* Llvm_analysis.assert_valid_function the_function; *)
+              the_function
+            end
        with e -> delete_function the_function; raise e
      end
