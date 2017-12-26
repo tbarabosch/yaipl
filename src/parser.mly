@@ -11,6 +11,7 @@
 %token BEGIN END
 %token IF THEN ELSE
 %token FOR IN
+%token ASSIGNMENT
 
 %left LT
 %left PLUS MINUS
@@ -53,3 +54,6 @@ function_body:
 | e = expr SEMICOLON { [e] }
 | e = expr SEMICOLON f = function_body { e :: f }
 | IF condition = expr THEN then_expr = expr ELSE else_expr = expr { [Astree.If (condition, then_expr, else_expr)] }
+| FOR loop_counter = ID ASSIGNMENT loop_start = expr COMMA loop_condition = expr COMMA
+  loop_step = expr IN BEGIN body = function_body END
+  { [Astree.For (loop_counter, loop_start, loop_condition, loop_step, body)]}

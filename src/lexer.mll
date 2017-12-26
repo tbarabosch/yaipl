@@ -26,6 +26,7 @@ rule read = parse
 | '<' { LT }
 | '(' { LPAREN }
 | ')' { RPAREN }
+| ":=" { ASSIGNMENT }
 | "if" { IF }
 | "then" { THEN }
 | "else" { ELSE }

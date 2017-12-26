@@ -6,4 +6,4 @@ type expr =
   | Prototype of string * string list
   | Function of expr * expr list
   | If of expr * expr * expr
-  | For of string * expr * expr * expr option * expr
+  | For of string * expr * expr * expr * expr list
