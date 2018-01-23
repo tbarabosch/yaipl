@@ -51,7 +51,7 @@ call_arguments:
 | arg = expr COMMA rest = call_arguments { arg :: rest}
 
 function_body:
-| e = expr SEMICOLON { [e] }
+| e = expr { [e] }
 | e = expr SEMICOLON f = function_body { e :: f }
 | IF condition = expr THEN then_expr = expr ELSE else_expr = expr { [Astree.If (condition, then_expr, else_expr)] }
 | FOR loop_counter = ID ASSIGNMENT loop_start = expr COMMA loop_condition = expr COMMA

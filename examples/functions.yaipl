@@ -1,1 +1,4 @@
-def test(x) begin (1+2+x)*(x+(1+2)) end;
+def test(x)
+    begin
+    (1+2+x)*(x+(1+2))
+    end

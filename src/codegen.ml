@@ -107,7 +107,7 @@ let rec codegen_stmt ast pass_manager = match ast with
        let then_bb = append_block context "then" the_function in
        position_at_end then_bb builder;
        let then_val = codegen_stmt then_expr pass_manager in
-       (* get an update of the then_bb since codegen may change the bb due to nested ifs *)
+       (* get an update of the then_bb since codegen may change the bb due to nested iss *)
        let new_then_bb = insertion_block builder in
 
        let else_bb = append_block context "else" the_function in
@@ -134,6 +134,51 @@ let rec codegen_stmt ast pass_manager = match ast with
        position_at_end merge_bb builder;
        phi
      end
+  | Astree.For (counter_name, start_, end_, step_size, body) ->
+     let start_val = codegen_stmt start_ pass_manager in
+     let preheader_bb = insertion_block builder in
+     let the_function = block_parent preheader_bb in
+     let loop_bb = append_block context "loop" the_function in
 
-       
+     ignore (build_br loop_bb builder);
+     position_at_end loop_bb builder;
+
+     (* build phi node for counter variable *)
+     let variable = build_phi [(start_val, preheader_bb)] counter_name builder in
+     let old_val =
+       try Some (Hashtbl.find named_values counter_name) with Not_found -> None
+     in
+     Hashtbl.add named_values counter_name variable;
+
+     (* build the body of the loop recursively *)
+     ignore(List.iter (fun e -> ignore (codegen_stmt e pass_manager)) body);
+
+     (* handle the step size of the loop *)
+     let step_val = codegen_stmt step_size pass_manager in
+     let next_var = build_fadd variable step_val "nextvar" builder in
+
+     (* insert the end condition of the loop *)
+     let end_cond = codegen_stmt end_ pass_manager in
+     let zero = const_float double_type 0.0 in
+     let end_cond = build_fcmp Fcmp.One end_cond zero "loopcond" builder in
+
+
+     (* after loop basic block *)
+     let loop_end_bb = insertion_block builder in
+     let after_bb = append_block context "afterloop" the_function in
+     ignore (build_cond_br end_cond loop_bb after_bb builder);
+     position_at_end after_bb builder;
+
+     (* add backwards branch to phi node *)
+     add_incoming (next_var, loop_end_bb) variable;
+
+     (* restore shadowed variable loop_counter *)
+     begin match old_val with
+     | Some old_val -> Hashtbl.add named_values counter_name old_val
+     | None -> ()
+     end;
+
+     (* standard return type of loop *)
+     const_null double_type
+     
        
