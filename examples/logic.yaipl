@@ -1,0 +1,11 @@
+def logic(a b c)
+    begin
+	if (a > b) & (a > c) then
+       	  a
+   	else if (b > a) & (b > c) then
+	    b
+	  else
+	    c
+    end
+
+logic(3,8,5);

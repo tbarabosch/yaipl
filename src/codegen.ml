@@ -36,6 +36,22 @@ let rec codegen_stmt ast pass_manager = match ast with
               let i = build_fcmp Fcmp.Ugt lhs_val rhs_val "cmptmp" builder in
               build_uitofp i double_type "booltmp" builder
             end
+         | '|' ->
+            begin
+              let zero = const_float double_type 0.0 in
+              let a_bool = build_fcmp Fcmp.Ugt lhs_val zero "cmptmp_a" builder in
+              let b_bool = build_fcmp Fcmp.Ugt rhs_val zero "cmptmp_b" builder in
+              let or_res = build_or a_bool b_bool "ortmp" builder in
+              build_uitofp or_res double_type "booltmp" builder
+            end
+         | '&' ->
+            begin
+              let zero = const_float double_type 0.0 in
+              let a_bool = build_fcmp Fcmp.Ugt lhs_val zero "cmptmp_a" builder in
+              let b_bool = build_fcmp Fcmp.Ugt rhs_val zero "cmptmp_b" builder in
+              let and_res = build_and a_bool b_bool "andtmp" builder in
+              build_uitofp and_res double_type "booltmp" builder
+            end
          | _ -> raise (Error "invalid binary operator")
        end
      end

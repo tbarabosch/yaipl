@@ -2,6 +2,7 @@
 %token <string> ID
 %token PLUS MINUS TIMES DIV
 %token LT GT
+%token LOR LAND
 %token DEF
 %token SEMICOLON
 %token COMMA
@@ -13,6 +14,7 @@
 %token FOR IN
 %token ASSIGNMENT
 
+%left LOR LAND
 %left LT GT
 %left PLUS MINUS
 %left TIMES DIV 
@@ -38,7 +40,11 @@ expr:
 | e1 = expr DIV e2 = expr { Astree.Binary ('/', e1, e2) }
 | e1 = expr LT e2 = expr { Astree.Binary ('<', e1, e2) }
 | e1 = expr GT e2 = expr { Astree.Binary ('>', e1, e2) }
+| e1 = expr LOR e2 = expr { Astree.Binary ('|', e1, e2) }
+| e1 = expr LAND e2 = expr { Astree.Binary ('&', e1, e2) }
 | name = ID LPAREN args = call_arguments RPAREN { Astree.Call (name, args) }
+| IF condition = expr THEN then_expr = expr ELSE else_expr = expr { Astree.If (condition, then_expr, else_expr) }
+
 
 signature:
 | symbol_name = ID LPAREN args = arguments RPAREN { Astree.Prototype (symbol_name, args) }
@@ -54,7 +60,6 @@ call_arguments:
 function_body:
 | e = expr { [e] }
 | e = expr SEMICOLON f = function_body { e :: f }
-| IF condition = expr THEN then_expr = expr ELSE else_expr = expr { [Astree.If (condition, then_expr, else_expr)] }
 | FOR loop_counter = ID ASSIGNMENT loop_start = expr COMMA loop_condition = expr COMMA
   loop_step = expr IN BEGIN body = function_body END
   { [Astree.For (loop_counter, loop_start, loop_condition, loop_step, body)]}

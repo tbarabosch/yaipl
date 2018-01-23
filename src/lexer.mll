@@ -25,6 +25,8 @@ rule read = parse
 | '/' { DIV }
 | '<' { LT }
 | '>' { GT }
+| '|' { LOR }
+| '&' { LAND }
 | '(' { LPAREN }
 | ')' { RPAREN }
 | ":=" { ASSIGNMENT }
