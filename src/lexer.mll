@@ -24,6 +24,7 @@ rule read = parse
 | '*' { TIMES }
 | '/' { DIV }
 | '<' { LT }
+| '>' { GT }
 | '(' { LPAREN }
 | ')' { RPAREN }
 | ":=" { ASSIGNMENT }

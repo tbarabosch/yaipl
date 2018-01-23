@@ -1,7 +1,7 @@
 %token <float> FLOAT
 %token <string> ID
 %token PLUS MINUS TIMES DIV
-%token LT
+%token LT GT
 %token DEF
 %token SEMICOLON
 %token COMMA
@@ -13,7 +13,7 @@
 %token FOR IN
 %token ASSIGNMENT
 
-%left LT
+%left LT GT
 %left PLUS MINUS
 %left TIMES DIV 
 
@@ -37,6 +37,7 @@ expr:
 | e1 = expr TIMES e2 = expr { Astree.Binary ('*', e1, e2) }
 | e1 = expr DIV e2 = expr { Astree.Binary ('/', e1, e2) }
 | e1 = expr LT e2 = expr { Astree.Binary ('<', e1, e2) }
+| e1 = expr GT e2 = expr { Astree.Binary ('>', e1, e2) }
 | name = ID LPAREN args = call_arguments RPAREN { Astree.Call (name, args) }
 
 signature:
