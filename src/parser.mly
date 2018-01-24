@@ -28,8 +28,15 @@ main:
 statement:
 | e = expr SEMICOLON { e }
 | EXTERN s = signature SEMICOLON { s }
-| DEF s = signature BEGIN b = function_body END { Astree.Function (s, b) }
+| DEF s = signature BEGIN b = body END { Astree.Function (s, b) }
 
+signature:
+| symbol_name = ID LPAREN args = arguments RPAREN { Astree.Prototype (symbol_name, args) }
+
+arguments:
+| arg = ID { [arg] }
+| arg = ID rest = arguments { arg :: rest}
+		
 expr:
 | LPAREN e = expr RPAREN { e }
 | i = ID { Astree.Variable i }
@@ -42,24 +49,16 @@ expr:
 | e1 = expr GT e2 = expr { Astree.Binary ('>', e1, e2) }
 | e1 = expr LOR e2 = expr { Astree.Binary ('|', e1, e2) }
 | e1 = expr LAND e2 = expr { Astree.Binary ('&', e1, e2) }
-| name = ID LPAREN args = call_arguments RPAREN { Astree.Call (name, args) }
+| name = ID LPAREN args = call_arguments RPAREN { Astree.Call (name, args) }		
 | IF condition = expr THEN then_expr = expr ELSE else_expr = expr { Astree.If (condition, then_expr, else_expr) }
-
-
-signature:
-| symbol_name = ID LPAREN args = arguments RPAREN { Astree.Prototype (symbol_name, args) }
-
-arguments:
-| arg = ID { [arg] }
-| arg = ID rest = arguments { arg :: rest}
-
+| FOR loop_counter = ID ASSIGNMENT loop_start = expr COMMA loop_condition = expr COMMA
+  loop_step = expr IN BEGIN b = body END
+  { Astree.For (loop_counter, loop_start, loop_condition, loop_step, b)}
+		
 call_arguments:
 | arg = expr { [arg] }
 | arg = expr COMMA rest = call_arguments { arg :: rest}
 
-function_body:
+body:
 | e = expr { [e] }
-| e = expr SEMICOLON f = function_body { e :: f }
-| FOR loop_counter = ID ASSIGNMENT loop_start = expr COMMA loop_condition = expr COMMA
-  loop_step = expr IN BEGIN body = function_body END
-  { [Astree.For (loop_counter, loop_start, loop_condition, loop_step, body)]}
+| e = expr SEMICOLON b = body { e :: b }
