@@ -3,7 +3,7 @@ open Llvm
 exception Error of string
 
 let context = global_context ()
-let the_module = create_module context "my cool jit"
+let the_module = create_module context "main"
 let builder = builder context
 let named_values:(string, llvalue) Hashtbl.t = Hashtbl.create 10
 let double_type = double_type context

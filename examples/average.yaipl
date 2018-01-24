@@ -1,0 +1,4 @@
+def average(a b)
+  begin
+    (a + b) / 2
+  end
