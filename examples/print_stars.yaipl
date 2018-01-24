@@ -7,6 +7,4 @@ def printstar(n)
         putchard(42)  # ascii 42 = '*'
       end
   end
-
-# print 100 '*' characters
-printstar(100);
+  
