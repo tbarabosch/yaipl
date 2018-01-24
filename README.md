@@ -1,42 +1,43 @@
 # YAIPL - Yet Another Imperative Programming Language
 
 This is yet another implementation of an imperative programming language (YAIPL). It is a fun project based on the LLVM Ocaml tutorial on [Kaleidoscope](https://llvm.org/docs/tutorial/OCamlLangImpl1.html)
-to understand the LLVM infrastructure's internals and its intermediate representation. Contrary to the tutorial, YAIPL's implementation does not implement the lexer and parser in pure Ocaml but rather utilizes ocamllex and menhir.
+to understand the LLVM infrastructure's internals and its intermediate representation. Contrary to the tutorial, YAIPL's implementation does not implement the lexer and parser in pure Ocaml but rather utilizes ocamllex and menhir. There are two ways to interact with YAIPL. The compiler yaiplc and the REPL yaipl.
 
-Compile it and test it as follows:
+Compile yaiplc, yaipl and its stdlib simply with:
 ``` bash
-./build.sh
-./yaipl.native 
-ready> def fib(x)
-  begin
-    if x < 3 then
-      1
-    else
-      fib(x-1)+fib(x-2)
-  end
-
-fib (20);
+make
 ```
-
-This should generate the following LLVM IR:
+To compile your fist YAIPL program:
 ``` bash
-define double @fib(double %x) {
+yaiplc.native examples/print_stars.yaipl print_stars
+clang++ examples/print_stars_main.cpp stdlib/io.o print_stars.o -o print_stars_main.out
+```
+And just execute it:
+
+``` bash
+./print_stars_main.out 
+****************************************************************************************************
+```
+yaiplc dumps also the llcode:
+``` llvm
+; ModuleID = 'main'
+source_filename = "main"
+
+declare double @putchard(double)
+
+define double @printstar(double %n) {
 entry:
-  %cmptmp = fcmp ult double %x, 3.000000e+00
-  br i1 %cmptmp, label %ifcont, label %else
+  br label %loop
 
-else:                                             ; preds = %entry
-  %subtmp = fadd double %x, -1.000000e+00
-  %calltmp = call double @fib(double %subtmp)
-  %subtmp1 = fadd double %x, -2.000000e+00
-  %calltmp2 = call double @fib(double %subtmp1)
-  %addtmp = fadd double %calltmp, %calltmp2
-  br label %ifcont
+loop:                                             ; preds = %loop, %entry
+  %i = phi double [ 1.000000e+00, %entry ], [ %nextvar, %loop ]
+  %calltmp = call double @putchard(double 4.200000e+01)
+  %nextvar = fadd double %i, 1.000000e+00
+  %cmptmp = fcmp ult double %i, %n
+  br i1 %cmptmp, label %loop, label %afterloop
 
-ifcont:                                           ; preds = %entry, %else
-  %iftmp = phi double [ %addtmp, %else ], [ 1.000000e+00, %entry ]
-  ret double %iftmp
+afterloop:                                        ; preds = %loop
+  ret double 0.000000e+00
 }
-  %calltmp3 = call double @fib(double 2.000000e+01)
 
 ```
