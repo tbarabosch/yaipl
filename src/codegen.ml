@@ -2,6 +2,7 @@ open Llvm
 
 exception Error of string
 
+(* TODO refactor these global variables *)
 let context = global_context ()
 let the_module = create_module context "main"
 let builder = builder context
